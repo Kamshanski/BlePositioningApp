@@ -1,7 +1,7 @@
-package edu.tpu.dar.ruban;
+package edu.tpu.dar.ruban.logic;
 
 public class MacAddress {
-    String macString;
+    public String macString;
 
     public MacAddress(String macString) {
         this.macString = macString.replaceAll(":", "");

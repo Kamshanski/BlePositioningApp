@@ -1,4 +1,4 @@
-package edu.tpu.dar.ruban;
+package edu.tpu.dar.ruban.utils;
 
 public class Pair {
 
@@ -11,7 +11,7 @@ public class Pair {
             this.second = 0;
         }
 
-        void add(int dFirst, double dSecond) {
+        public void add(int dFirst, double dSecond) {
             first += dFirst;
             second += dSecond;
         }

@@ -1,4 +1,6 @@
-package edu.tpu.dar.ruban;
+package edu.tpu.dar.ruban.logic;
+
+import edu.tpu.dar.ruban.logic.MeasurementMoment;
 
 import java.util.ArrayList;
 import java.util.HashMap;

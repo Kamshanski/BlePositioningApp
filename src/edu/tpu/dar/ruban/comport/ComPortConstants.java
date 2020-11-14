@@ -1,4 +1,4 @@
-package edu.tpu.dar.ruban;
+package edu.tpu.dar.ruban.comport;
 
 public class ComPortConstants {
     public static final int PAYLOAD_LENGTH = 858;   // "Payload:xxXXxxXXxxXX-SSID..." => 8 + 17*50
@@ -6,7 +6,7 @@ public class ComPortConstants {
     public static final char[] TIME_START = "TS:".toCharArray();
     public static final char[] TIME_END = "TE:".toCharArray();
     public static final char[] RELOADING = "ets".toCharArray();
-    public static final char[] ERROR = "error".toCharArray();
+    public static final char[] ERROR = "Guru".toCharArray();
     public static final char[] READY = "Device started".toCharArray();
     public static final char[] TARGET_SET_START = "Targets{".toCharArray();
     public static final char[] TARGET_SET_END = "}Targets".toCharArray();

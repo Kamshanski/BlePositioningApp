@@ -1,8 +1,8 @@
-package edu.tpu.dar.ruban;
+package edu.tpu.dar.ruban.logic;
+
+import edu.tpu.dar.ruban.utils.Pair;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 public class MeasurementMoment {
     private long timeStart, timeEnd;    // Locale time
@@ -29,12 +29,12 @@ public class MeasurementMoment {
             this.rssiArray = new HashMap<>(5);
         }
 
-        void put(int id, int rssi) {
+        public void put(int id, int rssi) {
             Pair.IntDouble pid = rssiArray.computeIfAbsent(id, k -> new Pair.IntDouble(0, 0.0));
             pid.add(1, rssi);
         }
 
-        MeasurementMoment build() {
+        public MeasurementMoment build() {
             MeasurementMoment mm = new MeasurementMoment(timeStart, timeEnd);
 
             rssiArray.forEach( (id, numRssiPair) -> {
