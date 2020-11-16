@@ -2,9 +2,16 @@ package edu.tpu.dar.ruban.view;
 
 import edu.tpu.dar.ruban.appcontrol.AppInterface;
 import edu.tpu.dar.ruban.appcontrol.Controller;
+import edu.tpu.dar.ruban.utils.U;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 public class Application extends JFrame{
     private JPanel panel1;
@@ -30,19 +37,42 @@ public class Application extends JFrame{
     private JPanel cardsHolder;
     private JTextArea txTargetsSet;
 
+    PaintPanel paintPanel;
     private CardLayout cardLayout;
 
     private AppInterfaceImpl app;
     private Controller controller;
 
     public Application() {
+        initApplication();
+
+        setContentPane(panel1);
+
+        createUIComponents();
+
+        initTrackingField();
+
+        setVisible(true);
+
+    }
+
+    public void initApplication() {
         app = new AppInterfaceImpl();
 
-        controller = Controller.getInstance(app);
-        setContentPane(panel1);
-        setVisible(true);
+        setSize(900, 700);
+        setTitle("BLE Positioning App");
+        try {
+            setIconImage(ImageIO.read(new File("./res/images/app_icon.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        createUIComponents();
+        controller = Controller.getInstance(app);
+    }
+
+    private void initTrackingField() {
+        paintPanel = new PaintPanel();
+        trackingCard.add(paintPanel);
     }
 
     private void createUIComponents() {
@@ -56,13 +86,37 @@ public class Application extends JFrame{
         // CardLayout switches
         btnExperiment.addActionListener(event -> cardLayout.show(cardsHolder, expCard.getName()));
         btnPositioning.addActionListener(event -> cardLayout.show(cardsHolder, trackingCard.getName()));
-        button99.addActionListener(event -> cardLayout.show(cardsHolder, zapasCard.getName()));
+        button99.addActionListener(event ->
+            {
+                //cardLayout.show(cardsHolder, zapasCard.getName());
+                paintPanel.mydraw();
+            }
+        );
 
         // ExpCard
         btnStartStopExperiment.addActionListener(controller::onStartStopExperimentClick);
         btnRecordExperiment.addActionListener(controller::onRecordClick);
         btnRemoveRecords.addActionListener(controller::onRemoveClick);
         btnShowResults.addActionListener(controller::onDisplayExperimentsResultsClick);
+
+        // TrackCard
+//        pField.setPreferredSize(new Dimension(500, 500));
+//        pField.addComponentListener(new ComponentAdapter() {
+//            @Override
+//            public void componentResized(ComponentEvent e) {
+//                Container pd = e.getComponent().getParent();
+//                int w = pd.getWidth();
+//                int h = pd.getHeight();
+//                Dimension d = e.getComponent().getPreferredSize();
+//                d.setSize(h, h);
+//                e.getComponent().setPreferredSize(d);
+//                U.nout("new");
+//
+////                if (w != h) {
+////                    e.getComponent().setSize(h, h);
+////                }
+//            }
+//        });
     }
 
     private class AppInterfaceImpl implements AppInterface{

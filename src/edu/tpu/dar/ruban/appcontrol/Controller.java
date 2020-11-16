@@ -115,7 +115,6 @@ public class Controller {
         app.printToExperimentsResultsLabel(builder.toString());
     }
 
-
     private class ComPortListenerImpl implements ComPortListener {
         @Override
         public void onTerminal(String msg) {
