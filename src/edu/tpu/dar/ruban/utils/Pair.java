@@ -26,4 +26,19 @@ public class Pair {
             this.second = second;
         }
     }
+
+    public static class DoubleDouble {
+        public double first;
+        public double second;
+
+        public DoubleDouble(double first, double second) {
+            this.first = 0.0;
+            this.second = 0.0;
+        }
+
+        public void add(double dFirst, double dSecond) {
+            first += dFirst;
+            second += dSecond;
+        }
+    }
 }

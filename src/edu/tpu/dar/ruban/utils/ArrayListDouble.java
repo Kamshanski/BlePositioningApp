@@ -1,21 +1,22 @@
 package edu.tpu.dar.ruban.utils;
 
-public class ArrayListInt {
+public class ArrayListDouble {
+
     public static final int SIZE_INCREMENT = 15;
-    int[] array;
+    double[] array;
     int size = 0;
 
-    public ArrayListInt(int initialCapacity) {
-        this.array = new int[initialCapacity];
+    public ArrayListDouble(int initialCapacity) {
+        this.array = new double[initialCapacity];
     }
 
-    public ArrayListInt() {
+    public ArrayListDouble() {
         this(15);
     }
 
     public void add(int d) {
         if (array.length >= size) {
-            int[] newArray = new int[array.length + SIZE_INCREMENT];
+            double[] newArray = new double[array.length + SIZE_INCREMENT];
             System.arraycopy(array, 0, newArray, 0, array.length);
             array = newArray;
         }
@@ -23,7 +24,7 @@ public class ArrayListInt {
         size++;
     }
 
-    public int get(int index) {
+    public double get(int index) {
         return array[index];
     }
 
@@ -31,8 +32,8 @@ public class ArrayListInt {
         return size;
     }
 
-    public int getSum() {
-        int sum = 0;
+    public double getSum() {
+        double sum = 0;
         for (int i = 0; i < size; i++) {
             sum += array[i];
         }
@@ -42,5 +43,4 @@ public class ArrayListInt {
     public void clear() {
         size = 0;
     }
-
 }
