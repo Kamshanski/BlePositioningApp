@@ -1,7 +1,9 @@
 package edu.tpu.dar.ruban.utils;
 
+import java.util.Arrays;
+
 // head is at last input
-public class SlidingWindowIntArray {
+public class SlidingWindowIntArray implements Cloneable {
     int[] window;
     final int size;
     int index = 0;
@@ -32,6 +34,10 @@ public class SlidingWindowIntArray {
             }
         }
         return window[ind];
+    }
+
+    public int[] toArray() {
+        return Arrays.copyOf(window, window.length);
     }
 
     public int getSize() {

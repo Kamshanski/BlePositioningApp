@@ -1,5 +1,7 @@
 package edu.tpu.dar.ruban.utils;
 
+import java.util.Arrays;
+
 public class ArrayListInt {
     public static final int SIZE_INCREMENT = 15;
     int[] array;
@@ -41,6 +43,10 @@ public class ArrayListInt {
 
     public void clear() {
         size = 0;
+    }
+
+    public int[] toArray() {
+        return Arrays.copyOf(array, array.length);
     }
 
 }
