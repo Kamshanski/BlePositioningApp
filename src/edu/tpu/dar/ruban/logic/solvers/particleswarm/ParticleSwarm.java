@@ -20,7 +20,6 @@ public class ParticleSwarm implements Estimator {
      *
      * @param maxIterations - N - cycles limit
      * @param pointsGrid - [xN, yN] - points along x and y axis (then total is xN*yN points)
-     * @param f -  function to minimize
      * @param constraints - [xMin, xMax, yMin, yMax]
      */
     public ParticleSwarm(int maxIterations, int[] pointsGrid, double[] constraints) {
