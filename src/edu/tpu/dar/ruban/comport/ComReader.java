@@ -31,6 +31,7 @@ public class ComReader implements SerialPortDataListener {
         if (event.getEventType() == LISTENING_EVENT_DATA_AVAILABLE) {
             U.nout("DATA_AVAILABLE");
         } else if (event.getEventType() == LISTENING_EVENT_DATA_RECEIVED) {
+            long curTime = System.currentTimeMillis();
             byte[] newData = event.getReceivedData();
             for (int i = 0; i < newData.length; ++i) {
                 char ch = (char) newData[i];
@@ -42,7 +43,7 @@ public class ComReader implements SerialPortDataListener {
                     comPortListener.onTerminal(builder.toString());
 
                     if (builder.length() == PAYLOAD_LENGTH && about(PAYLOAD)) {
-                        comPortListener.onPayload(timeStart, timeEnd, builder.toString());
+                        comPortListener.onPayload(timeStart, timeEnd, curTime, builder.toString());
                     } else if (about(TIME_START)) {
                         try {
                             timeStart = Long.parseLong(builder.substring(TIME_START.length));
@@ -127,16 +128,23 @@ public class ComReader implements SerialPortDataListener {
         return false;
     }
 
-    public void close() {
+    public boolean close() {
         if (isOpened) {
-            serialPort.closePort();
             isOpened = false;
+            return serialPort.closePort();
         }
+        return false;
     }
 
+    public boolean isOpened() {
+        return isOpened;
+    }
 
+    public int getPortNum() {
+        return portNum;
+    }
 
-//
+    //
 //    @Override
 //    public void serialEvent(SerialPortEvent event) {
 //        if (event.isRXCHAR() && event.getEventValue() > 0) {

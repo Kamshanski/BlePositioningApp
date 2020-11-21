@@ -1,8 +1,8 @@
 package edu.tpu.dar.ruban.logic.solvers.particleswarm;
 
-import edu.tpu.dar.ruban.logic.solvers.Dataset;
+import edu.tpu.dar.ruban.logic.measurement.Measurement;
 import edu.tpu.dar.ruban.logic.solvers.Estimator;
-import edu.tpu.dar.ruban.logic.solvers.solution.Dimensions;
+import edu.tpu.dar.ruban.logic.solvers.Dimensions;
 
 import java.util.Random;
 
@@ -13,7 +13,6 @@ public class ParticleSwarm implements Estimator {
     int xN, yN, pNum;               // points along x and y axis (then total is xN*yN points)
     double xMax, xMin, yMax, yMin;  // constraints to search inside
     Point2D[] points;               //
-    Function f;                     // function J(q_hat) to minimize
     Random uniformDistribution;
 
     /**
@@ -36,15 +35,13 @@ public class ParticleSwarm implements Estimator {
         pNum = xN*yN;                               // --------- Oy ---
         points = new Point2D[pNum];                 //
 
-        createShuffledPoints();
-
         gxTemp = gx;                                // Best point staring values
         gyTemp = gy;                                //
         gfTemp = gf;                                //
         gidTemp = gid;                              //
     }
 
-    public void createShuffledPoints() {
+    public void createShuffledPoints(MinimizedFunction f) {
         double dx = (xMax - xMin) / (xN - 1);
         double dy = (yMax - yMin) / (yN - 1);
 
@@ -64,7 +61,13 @@ public class ParticleSwarm implements Estimator {
             for (int j = 0; j < yN; j++) {
                 double y = yGrid[j];
 
-                Point2D p = new Point2D(x, y, uniformDistribution);
+                if (points[id] == null) {   // to save good coefs and memory
+                    points[id] = new Point2D(x, y, uniformDistribution);
+                }
+
+                Point2D p = points[id];
+                p.x = x;
+                p.y = y;
                 double fv = f.of(x, y);
                 p.setFunctionValue(fv);
                 p.setId(id);
@@ -85,8 +88,10 @@ public class ParticleSwarm implements Estimator {
 
 
     @Override
-    public Dimensions estimate(Dataset[] dataset) {
-        f = new LeastSquaresFunction(dataset);  // update function
+    public Dimensions estimate(Measurement[] dataset) {
+        // function J(q_hat) to minimize
+        MinimizedFunction f = new LeastSquaresFunction(dataset);  // update function
+        createShuffledPoints(f);
         double fv;
 
         for (int i = 0; i < N; i++)

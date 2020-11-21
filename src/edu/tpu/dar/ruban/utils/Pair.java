@@ -32,8 +32,8 @@ public class Pair {
         public double second;
 
         public DoubleDouble(double first, double second) {
-            this.first = 0.0;
-            this.second = 0.0;
+            this.first = first;
+            this.second = second;
         }
 
         public void add(double dFirst, double dSecond) {

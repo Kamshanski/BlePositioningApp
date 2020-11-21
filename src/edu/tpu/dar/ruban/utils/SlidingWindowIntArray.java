@@ -8,6 +8,11 @@ public class SlidingWindowIntArray implements Cloneable {
     final int size;
     int index = 0;
 
+    public SlidingWindowIntArray(int size, int initValue) {
+        this(size);
+        Arrays.fill(window, initValue);
+    }
+
     public SlidingWindowIntArray(int size) {
         window = new int[size];
         this.size = size;
@@ -29,7 +34,7 @@ public class SlidingWindowIntArray implements Cloneable {
                 ind += size;
             }
         } else if (ind >= size) {
-            while (ind > size) {
+            while (ind >= size) {
                 ind -= size;
             }
         }

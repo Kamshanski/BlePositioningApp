@@ -3,12 +3,17 @@ package edu.tpu.dar.ruban.utils;
 import java.util.Arrays;
 
 public class ArrayListInt {
-    public static final int SIZE_INCREMENT = 15;
+    public final int sizeIncrement;
     int[] array;
     int size = 0;
 
-    public ArrayListInt(int initialCapacity) {
+    public ArrayListInt(int initialCapacity, int sizeIncrement) {
+        this.sizeIncrement = sizeIncrement;
         this.array = new int[initialCapacity];
+    }
+
+    public ArrayListInt(int initialCapacity) {
+        this(initialCapacity, 15);
     }
 
     public ArrayListInt() {
@@ -16,8 +21,8 @@ public class ArrayListInt {
     }
 
     public void add(int d) {
-        if (array.length >= size) {
-            int[] newArray = new int[array.length + SIZE_INCREMENT];
+        if (array.length <= size) {
+            int[] newArray = new int[array.length + sizeIncrement];
             System.arraycopy(array, 0, newArray, 0, array.length);
             array = newArray;
         }
@@ -46,7 +51,7 @@ public class ArrayListInt {
     }
 
     public int[] toArray() {
-        return Arrays.copyOf(array, array.length);
+        return Arrays.copyOf(array, size);
     }
 
 }

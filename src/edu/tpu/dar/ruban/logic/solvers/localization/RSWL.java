@@ -1,8 +1,8 @@
 package edu.tpu.dar.ruban.logic.solvers.localization;
 
-import edu.tpu.dar.ruban.logic.solvers.Dataset;
+import edu.tpu.dar.ruban.logic.measurement.Measurement;
 import edu.tpu.dar.ruban.logic.solvers.Estimator;
-import edu.tpu.dar.ruban.logic.solvers.solution.Dimensions;
+import edu.tpu.dar.ruban.logic.solvers.Dimensions;
 
 public class RSWL implements Estimator {
     final double lambda, base;
@@ -15,15 +15,15 @@ public class RSWL implements Estimator {
     }
 
     @Override
-    public Dimensions estimate(Dataset[] dataset) {
+    public Dimensions estimate(Measurement[] dataset) {
         double exp;
         double numeratorX = 0.0, numeratorY = 0.0, denominator = 0.0;
 
-        for (Dataset d : dataset) {
+        for (Measurement d : dataset) {
             exp = Math.pow(base, RSSI_max - d.rssi);
 
-            numeratorX += exp * d.sx;
-            numeratorY += exp * d.sy;
+            numeratorX += exp * d.sx();
+            numeratorY += exp * d.sy();
             denominator += exp;
         }
 

@@ -1,7 +1,5 @@
 package edu.tpu.dar.ruban.logic.solvers.particleswarm;
 
-import edu.tpu.dar.ruban.logic.solvers.solution.Dimensions;
-
 import java.util.Random;
 
 // Добавить макс и мин значения для коэффициентов

@@ -36,6 +36,7 @@ public class Application extends JFrame{
     private JTextArea txComPortLog;
     private JPanel cardsHolder;
     private JTextArea txTargetsSet;
+    private JScrollPane scrollComPortLog;
 
     PaintPanel paintPanel;
     private CardLayout cardLayout;
@@ -50,8 +51,6 @@ public class Application extends JFrame{
 
         createUIComponents();
 
-        initTrackingField();
-
         setVisible(true);
 
     }
@@ -62,7 +61,7 @@ public class Application extends JFrame{
         setSize(900, 700);
         setTitle("BLE Positioning App");
         try {
-            setIconImage(ImageIO.read(new File("./res/images/app_icon.png")));
+            setIconImage(ImageIO.read(new File("./res/images/Bluetooth.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,13 +69,14 @@ public class Application extends JFrame{
         controller = Controller.getInstance(app);
     }
 
-    private void initTrackingField() {
-        paintPanel = new PaintPanel();
-        trackingCard.add(paintPanel);
-    }
-
     private void createUIComponents() {
         cardLayout = (CardLayout) cardsHolder.getLayout();
+
+        paintPanel = new PaintPanel();
+        trackingCard.add(paintPanel);
+
+        cmbComPortNum.setSelectedIndex(3);
+
         setListeners();
     }
 
@@ -132,6 +132,15 @@ public class Application extends JFrame{
         }
 
         @Override
+        public void setConnectionStatus(boolean connected) {
+            if (connected) {
+                btnConnect.setText("Disconnect from Main");
+            } else {
+                btnConnect.setText("Connect to Main");
+            }
+        }
+
+        @Override
         public void setSlaveNum(int slaveNum) {
             lblSlavesNum.setText(Integer.toString(slaveNum));
         }
@@ -147,15 +156,15 @@ public class Application extends JFrame{
         }
 
         @Override
-        public void setExperimentOn() {
-            btnConnect.setText("Stop Experiment");
-            lblExperimentOnOff.setText("On");
-        }
-
-        @Override
-        public void setExperimentOff() {
-            btnConnect.setText("Start Experiment");
-            lblExperimentOnOff.setText("Off");
+        public void setExperimentStatus(boolean isOn) {
+            if (isOn) {
+                btnStartStopExperiment.setText("Start Experiment");
+                lblExperimentOnOff.setText("Off");
+            }
+            else {
+                btnStartStopExperiment.setText("Stop Experiment");
+                lblExperimentOnOff.setText("On");
+            }
         }
 
         @Override
@@ -173,6 +182,8 @@ public class Application extends JFrame{
         public void println(String s) {
             txComPortLog.append(s);
             txComPortLog.append("\n");
+            JScrollBar vBar = scrollComPortLog.getVerticalScrollBar();
+            vBar.setValue(vBar.getMaximum());
         }
     }
 }

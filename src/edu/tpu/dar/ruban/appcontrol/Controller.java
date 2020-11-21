@@ -3,20 +3,15 @@ package edu.tpu.dar.ruban.appcontrol;
 
 import edu.tpu.dar.ruban.comport.ComPortListener;
 import edu.tpu.dar.ruban.comport.ComReader;
-import edu.tpu.dar.ruban.logic.BlePositioningModel;
-import edu.tpu.dar.ruban.logic.ExperimentStorageOfAll;
-import edu.tpu.dar.ruban.utils.ArrayListInt;
+import edu.tpu.dar.ruban.logic.Model;
+import edu.tpu.dar.ruban.logic.experiment.Experiment;
+import edu.tpu.dar.ruban.logic.experiment.ExperimentStorageOfAll;
 import edu.tpu.dar.ruban.utils.U;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+
+import static edu.tpu.dar.ruban.appcontrol.AppInterface.EXP_IS_OFF;
+import static edu.tpu.dar.ruban.appcontrol.AppInterface.EXP_IS_ON;
 
 public class Controller {
     private AppInterface app;
@@ -29,25 +24,37 @@ public class Controller {
 
     private Controller(AppInterface app) {
         this.app = app;
-        this.model = BlePositioningModel.getClearInstance(false);
+        this.model = Model.getClearInstance(false);
         comPortListener = new ComPortListenerImpl();
         comReader = new ComReader(comPortListener);
-
     }
 
     // Button Listeners
     public void onOpenConnectionClick(ActionEvent e) {
         String s = app.getComPortNum();
+        // Check comport num to be non-negative integer
         try {
-            comPortNum = Integer.parseInt(s);
+            int comPortNum = Integer.parseInt(s);
+            if (comPortNum < 0) {
+                throw new NumberFormatException("Number must be non-negative");
+            }
+            this.comPortNum = comPortNum;
         } catch (NumberFormatException ex) {
             println("Inserted ComPort Number isn't an Integer value. Insert int");
             printException(ex);
             return;
         }
 
-        if (comPortNum > -1) {
+        if (comReader.isOpened()) {
+            if (comReader.close()) {
+                app.setConnectionStatus(false);
+                println("Disconnected Successfully");
+            } else {
+                println("Disconnection failed");
+            }
+        } else {
             if (comReader.open(comPortNum)) {
+                app.setConnectionStatus(true);
                 println("Connected Successfully");
             } else {
                 println("Connection failed");
@@ -56,11 +63,11 @@ public class Controller {
     }
 
     public void onStartStopExperimentClick(ActionEvent e) {
-        ExperimentStorageOfAll experiment = model.getExperiment();
+        Experiment experiment = model.getExperiment();
         if (experiment.isOn()) {
             experiment.stopExperiment();
-            app.setExperimentOff();
-            println("Experiment " + experiment.currentExpName + " started");
+            println("Experiment " + experiment.getExpName() + " started");
+            app.setExperimentStatus(false);
         } else {
             String expName = app.getExpName();
             if (expName == null) {
@@ -76,25 +83,18 @@ public class Controller {
                 return;
             }
 
-            experiment.setExperimentName(expName);
-            experiment.startExperiment();
-            app.setExperimentOn();
+            app.setExperimentStatus(true);
+            experiment.startExperiment(expName);
             println("--Experiment " + expName + " started");
         }
     }
 
     public void onRecordClick(ActionEvent e) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd__HH-mm-ss");
-        LocalDateTime now = LocalDateTime.now();
-        Path expPath = Paths.get("C:\\Users\\epr2\\Desktop\\Exp_results__" + dtf.format(now) + ".txt");
         try {
-            Files.write(expPath, model.getExperiment().toString().getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE);
-        } catch (IOException ex) {
-            println("FILE WRITE FAIL");
-            printException(ex);
+            println("Experiment is saved as" + model.getExperiment().toExcel("onDemand"));
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-
-        model.getExperiment().toExcel("onDemand");
     }
 
     public void onRemoveClick(ActionEvent e) {
@@ -103,15 +103,19 @@ public class Controller {
             println("Experiment name is null!!!");
             return;
         }
-        model.getExperiment().rssiSet.computeIfPresent(expName, (k, v) -> new ArrayListInt());
+        model.getExperiment().clear();
 
     }
 
     public void onDisplayExperimentsResultsClick(ActionEvent e) {
         StringBuilder builder = new StringBuilder();
-        model.getExperiment().rssiSet.forEach((expName, data) -> {
-            builder.append(expName).append(": ").append(data.size()).append("\n");
-        });
+
+        if (model.getExperiment() instanceof ExperimentStorageOfAll) {
+            ((ExperimentStorageOfAll) model.getExperiment()).rssiSet.forEach((expName, data) -> {
+                builder.append(expName).append(": ").append(data.size()).append("\n");
+            });
+        }
+
         app.printToExperimentsResultsLabel(builder.toString());
     }
 
@@ -122,8 +126,8 @@ public class Controller {
         }
 
         @Override
-        public void onPayload(long timeStart, long timeEnd, String msg) {
-            model.putNewMeasurements(timeStart, timeEnd, msg);
+        public void onPayload(long timeStart, long timeEnd, long arrivalTime, String msg) {
+            model.putNewMeasurements(timeEnd - timeStart, arrivalTime, msg);
             println("New payload arrived");
         }
 
@@ -136,7 +140,7 @@ public class Controller {
 
         @Override
         public void onReady(String msg) {
-            model = BlePositioningModel.getClearInstance(true);
+            model = Model.getClearInstance(true);
             println("Device is On. All previous data was erased");
         }
 

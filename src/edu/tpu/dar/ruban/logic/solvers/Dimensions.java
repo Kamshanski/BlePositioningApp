@@ -1,4 +1,4 @@
-package edu.tpu.dar.ruban.logic.solvers.solution;
+package edu.tpu.dar.ruban.logic.solvers;
 
 public class Dimensions {
     public double x, y, z;

@@ -4,6 +4,8 @@ import edu.tpu.dar.ruban.utils.ArrayListDouble;
 import edu.tpu.dar.ruban.utils.ArrayListInt;
 import edu.tpu.dar.ruban.utils.Pair;
 
+import java.util.Arrays;
+
 public class MeanAndVariance implements Filter<Pair.DoubleDouble> {
     ArrayListInt rssis = new ArrayListInt(40);
     long rssiSum = 0;

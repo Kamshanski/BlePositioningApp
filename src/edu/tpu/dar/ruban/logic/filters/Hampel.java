@@ -37,7 +37,7 @@ public class Hampel implements Filter<int[]> {
         int medianInt = (int)Math.round(median);
         for (int i = 0; i < L; i++) {
             int z = rssis.get(i);
-            rssiArray[i] = (z > S) ? medianInt : z;
+            rssiArray[i] = (Math.abs(z-medianInt) > S) ? medianInt : z;
         }
 
         rssis.clear();

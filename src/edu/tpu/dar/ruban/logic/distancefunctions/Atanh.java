@@ -10,9 +10,13 @@ public class Atanh implements RssiFunction {
         this.bias = bias;
     }
 
+    public Atanh() {
+        this(90.0, 80.0, 20.0, 61.0);
+    }
+
     @Override
-    public double of(double x) {
-        return b * atanh((x + bias) / k) + a;
+    public double of(double rssi) {
+        return b * atanh((rssi + bias) / k) + a;
     }
 
     public double atanh(double x) {

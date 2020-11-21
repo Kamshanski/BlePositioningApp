@@ -1,5 +1,5 @@
 package edu.tpu.dar.ruban.logic.solvers.particleswarm;
 
-public interface Function {
+public interface MinimizedFunction {
     double of(double x, double y);
 }

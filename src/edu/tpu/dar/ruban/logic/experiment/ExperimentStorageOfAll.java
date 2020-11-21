@@ -1,4 +1,4 @@
-package edu.tpu.dar.ruban.logic;
+package edu.tpu.dar.ruban.logic.experiment;
 
 import edu.tpu.dar.ruban.utils.U;
 import edu.tpu.dar.ruban.utils.ArrayListInt;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class ExperimentStorageOfAll {
+public class ExperimentStorageOfAll implements Experiment {
     public Map<String, ArrayListInt> rssiSet;
     public String currentExpName;
     public String targetMac;
@@ -35,13 +35,12 @@ public class ExperimentStorageOfAll {
         rssiSet.computeIfAbsent(currentExpName, k -> new ArrayListInt()).add(rssi);
     }
 
-    public void setExperimentName(String expName) {
+    @Override
+    public void startExperiment(String expName) {
         currentExpName = expName;
-    }
-
-    public void startExperiment() {
         experimentAllowed = true;
     }
+    @Override
     public void stopExperiment() {
         experimentAllowed = false;
     }
@@ -49,8 +48,19 @@ public class ExperimentStorageOfAll {
     public boolean inExperiment(String mac, int id) {
         return mac.equals(this.targetMac) && id == this.sourceId;
     }
+    @Override
     public boolean isOn() {
         return experimentAllowed;
+    }
+
+    @Override
+    public String getExpName() {
+        return currentExpName;
+    }
+
+    @Override
+    public void clear() {
+        rssiSet.computeIfPresent(currentExpName, (k, v) -> new ArrayListInt());
     }
 
     @Override
@@ -67,6 +77,8 @@ public class ExperimentStorageOfAll {
         return builder.toString();
     }
 
+    // Returns string of path of excel file
+    @Override
     public String toExcel(String tag) {
         Workbook wb = new HSSFWorkbook();
         Sheet sheet = (HSSFSheet) wb.createSheet("Experiments");

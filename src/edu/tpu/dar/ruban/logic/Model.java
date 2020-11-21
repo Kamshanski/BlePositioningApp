@@ -2,54 +2,88 @@ package edu.tpu.dar.ruban.logic;
 
 
 import edu.tpu.dar.ruban.appcontrol.ModelInterface;
+import edu.tpu.dar.ruban.logic.core.MacAddress;
+import edu.tpu.dar.ruban.logic.experiment.Experiment;
+import edu.tpu.dar.ruban.logic.experiment.ExperimentOfPositioning;
+import edu.tpu.dar.ruban.logic.measurement.Moment;
+import edu.tpu.dar.ruban.logic.measurement.Storage;
 import edu.tpu.dar.ruban.utils.U;
 
 import java.util.HashMap;
 
-import static edu.tpu.dar.ruban.logic.Beacon.*;
+import static edu.tpu.dar.ruban.logic.core.Beacon.*;
 import static edu.tpu.dar.ruban.comport.ComPortConstants.PAYLOAD;
 
-public class BlePositioningModel implements ModelInterface {
+public class Model implements ModelInterface {
     private int slavesNum = 0;
     private int targetsNum = 0;
     private int targetsCapacity = 0;
     private MacAddress[] targetsMacs;
     private Storage storage;
-    public ExperimentStorageOfAll expStorage;
+    private Positioning positioning;
 
-    private BlePositioningModel() {
+    public ExperimentOfPositioning expStorage;
+
+
+    private Model() {
         storage = new Storage();
-        expStorage = new ExperimentStorageOfAll(BEACONS[TARGET].mac.macString, BEACONS[SOURCE].id);
+        positioning = new Positioning();
+
+        //expStorage = new ExperimentStorageOfAll(BEACONS.get(TARGET).mac.macString, BEACONS.get(SOURCE).id);
+        expStorage = new ExperimentOfPositioning(BEACONS.get(TARGET).mac, BEACONS.get(SOURCE).id);
     }
 
     @Override
-    public void putNewMeasurements(long timeStart, long timeEnd, String payload) {
-        MeasurementMoment.MeasurementMomentBuilder builder = new MeasurementMoment.MeasurementMomentBuilder(timeStart, timeEnd);
-        HashMap<String, MeasurementMoment.MeasurementMomentBuilder> tempHm = new HashMap<>();
-        String addrs = payload.substring(PAYLOAD.length);
-        int startIndex = 0;
+    public void putNewMeasurements(long duration, long arrivalTime, String payload) {
+        String addrs = payload.substring(PAYLOAD.length);   // to cut off all noisy data
 
-        for (int i = 0; i < 50; i++) {
+        HashMap<MacAddress, Moment> moments = new HashMap<>(10);
+
+        for (int i = 0, startIndex = 0; i < 50; i++) {
+            // dynamically go to next record in payload
             String macStr = addrs.substring(startIndex, startIndex+=12);
             String rssiStr = addrs.substring(startIndex, startIndex+=3);
-            String idStr = addrs.substring(startIndex, startIndex+=2);
+            String beaconIdStr = addrs.substring(startIndex, startIndex+=2);
 
-            MeasurementMoment.MeasurementMomentBuilder momentBuilder = tempHm.computeIfAbsent(macStr, k -> new MeasurementMoment.MeasurementMomentBuilder(timeStart, timeEnd) );
+            // get moment for selected mac or create new
+            MacAddress mac = storage.getMac(macStr);
+            Moment moment = moments.computeIfAbsent(mac,
+                    key -> new Moment(arrivalTime, arrivalTime+duration, key));
 
+            // Parse measurement and save it
             int rssi = Integer.parseInt(rssiStr, 16);
-            int id = Integer.parseInt(idStr, 16);
+            Integer beaconId = Integer.valueOf(beaconIdStr, 16);
+            moment.addMeasurement(rssi,
+                                  BEACONS.get(beaconId));
 
-            if (expStorage.inExperiment(macStr, id) && expStorage.isOn()) {
-                expStorage.add(rssi);
-            }
 
-            momentBuilder.put(id, rssi);
+
+            // experiment (measure rssi(pho) function
+//            if (expStorage.inExperiment(macStr, beaconId) && expStorage.isOn()) {
+//                expStorage.add(rssi);
+//            }
+
         }
 
-        tempHm.forEach( (mac, mmb) -> {
-            storage.add(mac, mmb.build());
-        });
+        storage.add(moments.values().toArray(new Moment[0]));
 
+        if (expStorage.isOn()) {
+            Moment[] ms = storage.get(-1);
+            for (Moment m : ms) {
+                if (expStorage.inExperiment(m.getMacAddress())) {
+                    try {
+                        expStorage.estimate(m);
+                    } catch (Exception ex) {
+                        U.nout("error, estimate");
+                        U.nout(ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        int a = 4;
+        // запустить здесь estimation для каждого MAC в отдельном потоке
     }
     @Override
     public boolean setSlavesNum(int slavesNum) {
@@ -120,19 +154,20 @@ public class BlePositioningModel implements ModelInterface {
     private boolean inUse = true;
 
     @Override
-    public ExperimentStorageOfAll getExperiment() {
+    public Experiment getExperiment() {
         return expStorage;
     }
 
-    private static BlePositioningModel instance;
-    public static BlePositioningModel getClearInstance(boolean clear) {
+
+    private static Model instance;
+    public static Model getClearInstance(boolean clear) {
         if (instance == null || clear) {
-            synchronized (BlePositioningModel.class) {
+            synchronized (Model.class) {
                 if (instance == null) {
-                    instance = new BlePositioningModel();
+                    instance = new Model();
                 } else if (clear) {
                     instance.inUse = false;
-                    instance = new BlePositioningModel();
+                    instance = new Model();
                 }
             }
         }
