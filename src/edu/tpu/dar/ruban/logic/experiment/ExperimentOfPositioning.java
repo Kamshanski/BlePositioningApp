@@ -51,7 +51,6 @@ public class ExperimentOfPositioning implements Experiment{
         this.sourceId = sourceId;
 
         clear();
-
     }
 
     @Override
@@ -203,10 +202,6 @@ public class ExperimentOfPositioning implements Experiment{
             r = sheet.createRow(i+emptyRowsNum);
             r.createCell(1, CellType.NUMERIC).setCellValue(i+1);
             r.createCell(2, CellType.NUMERIC).setCellValue(aRaw.get(i));
-//            for (int j = 0; j < hfams.size(); j++) {
-//                HampelFilterArrayMetadata h = hfams.get(j);
-//                r.createCell(j+3, CellType.NUMERIC).setCellValue(h.storage.get(i));
-//            }
             r.createCell(3, CellType.NUMERIC).setCellValue(aHampel.get(i));
             r.createCell(4, CellType.NUMERIC).setCellValue(aKalman.get(i));
             r.createCell(5, CellType.NUMERIC).setCellValue(aKaufman.get(i));
@@ -214,6 +209,10 @@ public class ExperimentOfPositioning implements Experiment{
             r.createCell(7, CellType.NUMERIC).setCellValue(aKaufmanHampel.get(i));
             r.createCell(8, CellType.NUMERIC).setCellValue(aDistance.get(i));
 
+//            for (int j = 0; j < hfams.size(); j++) {
+//                HampelFilterArrayMetadata h = hfams.get(j);
+//                r.createCell(j+3, CellType.NUMERIC).setCellValue(h.storage.get(i));
+//            }
 //            r.createCell(6, CellType.NUMERIC).setCellValue(aMean.get(i));
 //            r.createCell(9, CellType.NUMERIC).setCellValue(aMeanHampel.get(i));
 //            r.createCell(10, CellType.NUMERIC).setCellValue(aRaw.get(i)-aHampel.get(i));

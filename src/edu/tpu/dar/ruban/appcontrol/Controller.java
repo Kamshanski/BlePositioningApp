@@ -14,6 +14,7 @@ import static edu.tpu.dar.ruban.appcontrol.AppInterface.EXP_IS_OFF;
 import static edu.tpu.dar.ruban.appcontrol.AppInterface.EXP_IS_ON;
 
 public class Controller {
+    private PlotInterface plot;
     private AppInterface app;
     private ModelInterface model;
 
@@ -24,7 +25,7 @@ public class Controller {
 
     private Controller(AppInterface app) {
         this.app = app;
-        this.model = Model.getClearInstance(false);
+        this.model = Model.getClearInstance(false, this);
         comPortListener = new ComPortListenerImpl();
         comReader = new ComReader(comPortListener);
     }
@@ -119,6 +120,10 @@ public class Controller {
         app.printToExperimentsResultsLabel(builder.toString());
     }
 
+    public void plotNewData(double[] data) {
+        plot.putNewData(data);
+    }
+
     private class ComPortListenerImpl implements ComPortListener {
         @Override
         public void onTerminal(String msg) {
@@ -140,7 +145,7 @@ public class Controller {
 
         @Override
         public void onReady(String msg) {
-            model = Model.getClearInstance(true);
+            model = Model.getClearInstance(true, Controller.this);
             println("Device is On. All previous data was erased");
         }
 
@@ -175,6 +180,10 @@ public class Controller {
             }
             app.setSlaveNum(slaveNum);
         }
+    }
+
+    public void setPlotInterface(PlotInterface plot) {
+        this.plot = plot;
     }
 
     // Utils

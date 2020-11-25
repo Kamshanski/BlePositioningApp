@@ -6,8 +6,8 @@ import java.awt.geom.AffineTransform;
 public class PaintString extends PaintObject {
     private String str;
 
-    public PaintString(String str, Color color, double nominalX, double nominalY, double nominalDX, double nominalDY) {
-        super(color, nominalX, nominalY, nominalDX, nominalDY);
+    public PaintString(String str, Color color, double nominalX, double nominalY) {
+        super(color, nominalX, nominalY, 0, 0);
         this.str = str;
     }
 

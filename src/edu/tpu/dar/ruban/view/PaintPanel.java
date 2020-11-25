@@ -6,8 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PaintPanel extends JPanel {
-    private double W = 2200;
-    private double H = 2000;
+    private final double W = 2200;
+    private final double H = 2000;
     double wr;
     double hr;
     PaintObject[] staticPaintings = new PaintObject[7];
@@ -23,14 +23,16 @@ public class PaintPanel extends JPanel {
 
         initGraphicsList();
     }
-    public void initGraphicsList() {
+    private void initGraphicsList() {
+        // Static coordinated wrt (W,H)
         staticPaintings[MAIN_FIELD] = new PaintRectangle(Color.white, Color.black, 133.33, 133.33, 1933.334, 1733.334);
-        staticPaintings[BEACON+1] = new PaintString("1", Color.white, 127, 130, 0,0);
-        staticPaintings[BEACON+2] = new PaintString("2", Color.white, 2066.7, 130, 0,0);
-        staticPaintings[BEACON+3] = new PaintString("3", Color.white, 2066.7, 1950, 0,0);
-        staticPaintings[BEACON+4] = new PaintString("4", Color.white, 127, 1950, 0,0);
-        staticPaintings[FIELD_W] = new PaintString("2200мм", Color.white, 1100, 130, 0,0);
-        staticPaintings[FIELD_H] = new PaintString("2000мм", Color.white, 2, 1000, 0,0);
+        staticPaintings[BEACON+1] = new PaintString("1", Color.white, 127, 130);
+        staticPaintings[BEACON+2] = new PaintString("2", Color.white, 2066.7, 130);
+        staticPaintings[BEACON+3] = new PaintString("3", Color.white, 2066.7, 1950);
+        staticPaintings[BEACON+4] = new PaintString("4", Color.white, 127, 1950);
+        staticPaintings[FIELD_W] = new PaintString("2200мм", Color.white, 1100, 130);
+        staticPaintings[FIELD_H] = new PaintString("2000мм", Color.white, 2, 1000);
+
         target = new PaintCircle(Color.red, null, 1000,1000,50,50);
     }
 

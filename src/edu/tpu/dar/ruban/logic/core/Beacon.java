@@ -9,9 +9,9 @@ public class Beacon {
     public boolean isMain;
     public double x, y, z;
 
-    public static final int MAIN = 0;
+    public static final int MAIN = 37;
     public static final int TARGET = 42;
-    public static final int SOURCE = 41;
+    public static final int SOURCE = 37;
 
     public static final Map<Integer, Beacon> BEACONS;
     static {

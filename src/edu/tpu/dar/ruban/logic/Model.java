@@ -1,6 +1,7 @@
 package edu.tpu.dar.ruban.logic;
 
 
+import edu.tpu.dar.ruban.appcontrol.Controller;
 import edu.tpu.dar.ruban.appcontrol.ModelInterface;
 import edu.tpu.dar.ruban.logic.core.MacAddress;
 import edu.tpu.dar.ruban.logic.experiment.Experiment;
@@ -9,12 +10,15 @@ import edu.tpu.dar.ruban.logic.measurement.Moment;
 import edu.tpu.dar.ruban.logic.measurement.Storage;
 import edu.tpu.dar.ruban.utils.U;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static edu.tpu.dar.ruban.logic.core.Beacon.*;
 import static edu.tpu.dar.ruban.comport.ComPortConstants.PAYLOAD;
 
 public class Model implements ModelInterface {
+    private Controller c;
+
     private int slavesNum = 0;
     private int targetsNum = 0;
     private int targetsCapacity = 0;
@@ -25,7 +29,8 @@ public class Model implements ModelInterface {
     public ExperimentOfPositioning expStorage;
 
 
-    private Model() {
+    private Model(Controller controller) {
+        c = controller;
         storage = new Storage();
         positioning = new Positioning();
 
@@ -36,6 +41,8 @@ public class Model implements ModelInterface {
     @Override
     public void putNewMeasurements(long duration, long arrivalTime, String payload) {
         String addrs = payload.substring(PAYLOAD.length);   // to cut off all noisy data
+
+        ArrayList<Double> newPlotData = new ArrayList<>(15);
 
         HashMap<MacAddress, Moment> moments = new HashMap<>(10);
 
@@ -55,15 +62,22 @@ public class Model implements ModelInterface {
             Integer beaconId = Integer.valueOf(beaconIdStr, 16);
             moment.addMeasurement(rssi,
                                   BEACONS.get(beaconId));
-
-
+                                                //
+            if (beaconId == expStorage.sourceId
+                    //&& mac.equals(new MacAddress("5cea6a1d4842"))
+                    && mac.equals(expStorage.targetMac)
+            ) {
+                newPlotData.add((double) rssi);
+            }
 
             // experiment (measure rssi(pho) function
 //            if (expStorage.inExperiment(macStr, beaconId) && expStorage.isOn()) {
 //                expStorage.add(rssi);
 //            }
-
         }
+
+
+
 
         storage.add(moments.values().toArray(new Moment[0]));
 
@@ -81,6 +95,18 @@ public class Model implements ModelInterface {
                 }
             }
         }
+
+        try {
+            double[] d = new double[newPlotData.size()];
+            for (int i = 0; i < d.length; i++) {
+                d[i] = newPlotData.get(i);
+            }
+            U.invertArray(d);
+            c.plotNewData(d);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
 
         int a = 4;
         // запустить здесь estimation для каждого MAC в отдельном потоке
@@ -160,14 +186,14 @@ public class Model implements ModelInterface {
 
 
     private static Model instance;
-    public static Model getClearInstance(boolean clear) {
+    public static Model getClearInstance(boolean clear, Controller controller) {
         if (instance == null || clear) {
             synchronized (Model.class) {
                 if (instance == null) {
-                    instance = new Model();
+                    instance = new Model(controller);
                 } else if (clear) {
                     instance.inUse = false;
-                    instance = new Model();
+                    instance = new Model(controller);
                 }
             }
         }

@@ -6,13 +6,15 @@ import edu.tpu.dar.ruban.logic.distancefunctions.RssiFunction;
 import edu.tpu.dar.ruban.logic.filters.Filter;
 import edu.tpu.dar.ruban.logic.solvers.Estimator;
 import edu.tpu.dar.ruban.logic.solvers.Dimensions;
+import edu.tpu.dar.ruban.utils.U;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Moment {
     MacAddress macAddress;
     long timeStart, timeEnd;    // timestamp
-    ArrayList<Measurement> measurements = new ArrayList<>(20);
+    LinkedList<Measurement> measurements = new LinkedList<>();
     Dimensions q;               // estimation
     Metadata metadata;          // function, estimator and filters simple class names
 
@@ -23,7 +25,7 @@ public class Moment {
     }
 
     public void addMeasurement(int rssi, Beacon beacon) {
-        measurements.add(new Measurement(rssi, beacon));
+        measurements.addFirst(new Measurement(rssi, beacon));
     }
 
     public void setMetadata(Filter<?> filter, RssiFunction function, Estimator estimation) {
@@ -35,7 +37,8 @@ public class Moment {
     }
 
     public Measurement[] getMeasurements() {
-        return measurements.toArray(new Measurement[0]);
+        Measurement[] m = measurements.toArray(new Measurement[0]);
+        return m;
     }
 
     public MacAddress getMacAddress() {
