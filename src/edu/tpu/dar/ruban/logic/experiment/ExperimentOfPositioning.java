@@ -207,7 +207,7 @@ public class ExperimentOfPositioning implements Experiment{
             r.createCell(5, CellType.NUMERIC).setCellValue(aKaufman.get(i));
             r.createCell(6, CellType.NUMERIC).setCellValue(aKalmanHampel.get(i));
             r.createCell(7, CellType.NUMERIC).setCellValue(aKaufmanHampel.get(i));
-            r.createCell(8, CellType.NUMERIC).setCellValue(aDistance.get(i));
+            //r.createCell(8, CellType.NUMERIC).setCellValue(aDistance.get(i));
 
 //            for (int j = 0; j < hfams.size(); j++) {
 //                HampelFilterArrayMetadata h = hfams.get(j);

@@ -34,7 +34,7 @@ public class ArrayListDouble {
     public double get(int index) {
         if (index < 0) {
             index += size;
-        } else if (index > 0){
+        } else if (index >= size){
             index -= size;
         }
         return array[index];
